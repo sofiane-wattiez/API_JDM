@@ -5,16 +5,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ArticlesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: ArticlesRepository::class)]
 #[ApiResource(
+    // attributes:[
+    //     'validation_groups' => []
+    // ],
     normalizationContext: [
         'groups' => ['read:collection']
     ] ,
     denormalizationContext: [
         'groups' => ['write:Articles']
     ] ,
-    // collectionOperations:[],
+    collectionOperations:[
+        'get' ,
+        'post' 
+        // => [
+        //     'validation_groups' => [ Articles::class, 'validationGroups' ] 
+        // ]
+    ],
     itemOperations: [
         'put' ,
         'delete',
@@ -32,7 +43,10 @@ class Articles
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['read:collection' , 'write:Articles'])]
+    #[
+        Groups(['read:collection' , 'write:Articles']),
+        Length(min:5, max:50 , groups:['create:Articles'])
+    ]
     private $title;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -51,9 +65,17 @@ class Articles
     #[Groups(['read:item'])]
     private $updateAt;
 
-    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'articles')]
-    #[Groups(['read:item' , 'write:Articles'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'articles', cascade: ['persist'] ) ]
+    #[Groups(['read:item' , 'write:Articles']),
+        Valid()
+    ]
     private $category;
+
+    // public static function validationGroups(self $articles)
+    // {
+    //     // dd($post);
+    //     return ['create:Articles'];
+    // }
 
     public function __construct()
     {
