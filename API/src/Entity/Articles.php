@@ -1,37 +1,65 @@
 <?php
 
 namespace App\Entity;
-
+use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ArticlesRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ArticlesRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: [
+        'groups' => ['read:collection']
+    ] ,
+    denormalizationContext: [
+        'groups' => ['write:Articles']
+    ] ,
+    // collectionOperations:[],
+    itemOperations: [
+        'put' ,
+        'delete',
+        'get'   => [
+            'normalization_context' => ['groups' => ['read:collection' ,'read:item' , 'read:Articles']],
+        ]
+    ]
+)]
 class Articles
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:collection'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['read:collection' , 'write:Articles'])]
     private $title;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['read:collection' , 'write:Articles'])]
     private $slug;
 
     #[ORM\Column(type: 'text')]
+    #[Groups(['read:item' , 'write:Articles'])]
     private $content;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['read:item'])]
     private $createdAt;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['read:item'])]
     private $updateAt;
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'articles')]
+    #[Groups(['read:item' , 'write:Articles'])]
     private $category;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->updateAt = new \DateTime();
+    }
 
     public function getId(): ?int
     {
