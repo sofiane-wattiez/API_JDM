@@ -4,7 +4,9 @@
 
 * This api is created with Grafikart french course for Api-Platform libraries :
 
+* This code is result of course with symfony6 and php8 version
+
 * sources : https://grafikart.fr/tutoriels/api-platform-intro-1902#autoplay
 
 
-Actuel Step :  4 "La Validation"
+Actuel Step :  5 "Pagination et Filtres"
