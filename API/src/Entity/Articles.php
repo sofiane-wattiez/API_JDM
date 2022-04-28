@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Entity;
+
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ArticlesRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\Length;
@@ -19,6 +22,9 @@ use Symfony\Component\Validator\Constraints\Valid;
     denormalizationContext: [
         'groups' => ['write:Articles']
     ] ,
+    paginationItemsPerPage:5,
+    paginationMaximumItemsPerPage:5,
+    paginationClientItemsPerPage:true,
     collectionOperations:[
         'get' ,
         'post' 
@@ -33,7 +39,11 @@ use Symfony\Component\Validator\Constraints\Valid;
             'normalization_context' => ['groups' => ['read:collection' ,'read:item' , 'read:Articles']],
         ]
     ]
-)]
+        ),
+ApiFilter(SearchFilter::class, properties: ['id' => 'exact' , 'title' => 'partial' ])
+]
+// Choice class SearchFilter from Doctrine ORM
+
 class Articles
 {
     #[ORM\Id]
