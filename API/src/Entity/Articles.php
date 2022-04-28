@@ -37,11 +37,36 @@ use Symfony\Component\Validator\Constraints\Valid;
             'path' => '/articles/count',
             'controller' => ArticlesCountController::class ,
             'read' => false,
-            'paginationEnabled' => false,
-            'filter' => [] ,
+            'pagination_enabled' => false,
+            'filters' => [] ,
             'openapi_context' => [
                 'summary' => 'Récurpère le nombre total d\'article',
-                'parameters' => [],
+                'parameters' => [
+                    [
+                    'in' => 'query',
+                    'name' => 'online',
+                    'schema' =>
+                        [
+                            'type' => 'query',
+                            'maximum' => 1,
+                            'minimum' => 0
+                        ],
+                    'description' => 'Filtre les articles en ligne , écrire 1 pour demander les articles en ligne actuellement'
+                    ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'OK',
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'example' => 3
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ]
         ]
         // => [
