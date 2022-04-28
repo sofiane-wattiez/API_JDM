@@ -9,4 +9,4 @@
 * sources : https://grafikart.fr/tutoriels/api-platform-intro-1902#autoplay
 
 
-Actuel Step :  5 "Pagination et Filtres"
+Actual Step :  8 
