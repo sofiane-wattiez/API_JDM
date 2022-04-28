@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use App\Controller\ArticlesPublishController;
+use App\Controller\ArticlesCountController;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiProperty;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
@@ -17,7 +20,8 @@ use Symfony\Component\Validator\Constraints\Valid;
     //     'validation_groups' => []
     // ],
     normalizationContext: [
-        'groups' => ['read:collection']
+        'groups' => ['read:collection'],
+        'openapi_definition_name' => 'Collection'
     ] ,
     denormalizationContext: [
         'groups' => ['write:Articles']
@@ -27,7 +31,19 @@ use Symfony\Component\Validator\Constraints\Valid;
     paginationClientItemsPerPage:true,
     collectionOperations:[
         'get' ,
-        'post' 
+        'post',
+        'count' => [
+            'method' => 'GET',
+            'path' => '/articles/count',
+            'controller' => ArticlesCountController::class ,
+            'read' => false,
+            'paginationEnabled' => false,
+            'filter' => [] ,
+            'openapi_context' => [
+                'summary' => 'Récurpère le nombre total d\'article',
+                'parameters' => [],
+            ]
+        ]
         // => [
         //     'validation_groups' => [ Articles::class, 'validationGroups' ] 
         // ]
@@ -37,6 +53,23 @@ use Symfony\Component\Validator\Constraints\Valid;
         'delete',
         'get'   => [
             'normalization_context' => ['groups' => ['read:collection' ,'read:item' , 'read:Articles']],
+            'openapi_definition_name' => 'Detail'
+        ],
+        // permet de modifier l'interface swagger
+        'publish' => [
+            'method' => 'POST',
+            'path' => '/articles/{id}/publish',
+            'controller' => ArticlesPublishController::class ,
+            'openapi_context' => [
+            'summary'=> 'Permet de publier un article' ,
+            'requestBody' => [
+                'content' => [
+                    'application/json' => [
+                        'schema' => []
+                    ]
+                ]
+                ]
+            ]
         ]
     ]
         ),
@@ -80,6 +113,12 @@ class Articles
         Valid()
     ]
     private $category;
+
+    #[ORM\Column(type: 'boolean' , options: ['default' => '0'] )]
+    #[Groups(['read:collection']),
+        ApiProperty(openapiContext:['type' => 'boolean' , 'description' => 'Statut de connexion'])
+    ]
+    private $online = false;
 
     // public static function validationGroups(self $articles)
     // {
@@ -166,6 +205,18 @@ class Articles
     public function setCategory(?Category $category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getOnline(): ?bool
+    {
+        return $this->online;
+    }
+
+    public function setOnline(bool $online): self
+    {
+        $this->online = $online;
 
         return $this;
     }
