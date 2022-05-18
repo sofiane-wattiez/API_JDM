@@ -8,5 +8,7 @@
 
 * sources : https://grafikart.fr/tutoriels/api-platform-intro-1902#autoplay
 
+```composer require ramsey/uuid```
+
 
 Actual Step :  9 [Data Provider]
